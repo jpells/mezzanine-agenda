@@ -148,7 +148,6 @@ def icalendar(request, tag=None, year=None, month=None, username=None,
         author = get_object_or_404(User, username=username)
         events = events.filter(user=author)
     if not tag and not year and not location and not username:
-        print "HERE"
         events = events.filter(Q(start__gt=datetime.now()) | Q(end__gt=datetime.now())).order_by("start")
 
     prefetch = ("keywords__keyword",)
