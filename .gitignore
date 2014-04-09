@@ -2,3 +2,4 @@
 *.egg-info/*
 *.db
 .DS_Store
+setuptools_git*

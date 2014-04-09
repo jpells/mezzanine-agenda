@@ -1,5 +1,18 @@
 {% load event_tags keyword_tags i18n future %}
 
+{% block upcoming_events %}
+{% upcoming_events 5 as upcoming_events %}
+{% if upcoming_events %}
+<h3>{% trans "Upcoming Events" %}</h3>
+<ul class="list-unstyled upcoming-events">
+{% for upcoming_event in upcoming_events %}
+<li><a href="{{ upcoming_event.get_absolute_url }}"
+    >{{ upcoming_event.title }}</a></li>
+{% endfor %}
+</ul>
+{% endif %}
+{% endblock %}
+
 {% block recent_events %}
 {% recent_events 5 as recent_events %}
 {% if recent_events %}

@@ -43,7 +43,7 @@ The following template tags and filters can be used:
 - `{% event_months as months %}` - Put a list of dates for events into the template context.
 - `{% event_locations as locations %}` - Put a list of locations for events into the template context.
 - `{% event_authors as authors %}` - Put a list of authors (users) for events into the template context.
-- `{% recent_events limit=5 tag="django" location="home" username="admin" as recent_events %}` - Put a list of recently published events into the template context. A tag title or slug, location title or slug or author's username can also be specified to filter the recent events returned.
+- `{% recent_events limit=5 tag="django" location="home" username="admin" as recent_events %}` - Put a list of recent events into the template context. A tag title or slug, location title or slug or author's username can also be specified to filter the recent events returned.
 - `{% google_static_map event <width> <height> <zoom> %}` - Produces a Google static map centred around the event location, zoomed to the specified level. Produces the entire `img` tag, not just the URL.
 - `{% icalendar_url %}` - Returns the URL to an iCalendar file containing this event. Upon downloading this file, most calendar software including Outlook and iCal will handle this by adding it to their calendars.
 - `{{ event|google_calendar_url }}` - Returns a Google Calendar template URL. Google Calendar users can click a link to this URL to add the event to their calendar.
