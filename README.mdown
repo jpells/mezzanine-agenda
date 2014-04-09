@@ -1,0 +1,71 @@
+# mezzanine-agenda
+
+This plugin gives you Event functionality for your Mezzanine sites.
+
+## Features
+
+* Show your visitors where to go
+	* Embed a map of the location in one line of code with the Google Static Maps template tag
+	* Provide a "Get Directions" link so users can go there in one click
+* Let your visitors add a single event or subscribe to all future events in Google Calendar, Outlook, iCal and more with Google Calendar and webcal:// URLs and iCalendar files
+
+## Installation
+
+* Run `pip install mezzanine-agenda` (or, if you want to hack on mezzanine-agenda, clone it and run `pip install -e path/to/repo`)
+* Add `"mezzanine_agenda"` to your `INSTALLED_APPS`
+* Add `("^%s/" settings.EVENT_SLUG, include("mezzanine_agenda.urls"))` to your `urls.py`
+* Set either the `TIME_ZONE` or `EVENT_TIME_ZONE` settings. (If neither of these settings are set, the Google Calendar links will not work as expected.)
+* Migrate your database
+* Create RichText Page `Events` similiar to `Blog` (can be done via python manage.py loaddata events_page or through admin). Ensure the page slug = settings.EVENT_SLUG.
+
+## Creating Templates
+
+In addition to the documentation here, take a look at how the default templates in the `mezzanine_agenda/templates` directory are written.
+
+### Event List pages
+
+The template for an Event List page is `templates/agenda/event_list.html`.
+
+Iterate over `events` to get at the events inside the container. You can then use all of the properties and template tags listed above on these objects.
+
+### Event Detail pages
+
+The template for an Event Detail page is `templates/agenda/event_detail.html`.
+
+The Event object is available at `event`. It has the following properties:
+
+* Dates and times: `start`, `end`
+* Location info: `location.address`, `location.mappable_location`, `lat`, `lon`
+
+## Template Tags
+
+The following template tags and filters can be used:
+- `{% event_months as months %}` - Put a list of dates for events into the template context.
+- `{% event_locations as locations %}` - Put a list of locations for events into the template context.
+- `{% event_authors as authors %}` - Put a list of authors (users) for events into the template context.
+- `{% recent_events limit=5 tag="django" location="home" username="admin" as recent_events %}` - Put a list of recently published events into the template context. A tag title or slug, location title or slug or author's username can also be specified to filter the recent events returned.
+- `{% google_static_map event <width> <height> <zoom> %}` - Produces a Google static map centred around the event location, zoomed to the specified level. Produces the entire `img` tag, not just the URL.
+- `{% icalendar_url %}` - Returns the URL to an iCalendar file containing this event. Upon downloading this file, most calendar software including Outlook and iCal will handle this by adding it to their calendars.
+- `{{ event|google_calendar_url }}` - Returns a Google Calendar template URL. Google Calendar users can click a link to this URL to add the event to their calendar.
+- `{{ event|google_nav_url }}` - Returns the URL to a page on Google Maps showing the location .
+
+## Settings
+
+* `EVENT_USE_FEATURED_IMAGE` - Enable featured images in events. Default: `False`.
+* `EVENT_URLS_DATE_FORMAT` - A string containing the value ``year``, ``month``, or ``day``, which controls the granularity of the date portion in the URL for each event. Eg: ``year`` will define URLs in the format /events/yyyy/slug/, while ``day`` will define URLs with the format /events/yyyy/mm/dd/slug/. An empty string means the URLs will only use the slug, and not contain any portion of the date at all. Default: `''`.
+* `EVENT_PER_PAGE` - Number of events shown on a event listing page. Default: `5`.
+* `EVENT_RSS_LIMIT` - Number of most recent events shown in the RSS feed. Set to ``None`` to display all events in the RSS feed. Default: `20`.
+* `EVENT_SLUG` - Enable featured images in events. Default: `'events'`.
+* `EVENT_GOOGLE_MAPS_DOMAIN` - The Google Maps country domain to query for geocoding. Setting this accurately improves results when users forget to enter a country in the mappable address. Default: `'maps.google.com'`.
+* `EVENT_HIDPI_STATIC_MAPS` - Whether the `{% google_static_map %}` template tag generates a map suitable for high DPI displays such as the MacBook Pro with Retina Display and many newer smartphones. Default: `True`.
+* `EVENT_TIME_ZONE` - The time zone that the event dates and times are in. Either this or the `TIME_ZONE` setting needs to be set.
+
+## License
+
+Copyright (C) 2014 James Pells
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.

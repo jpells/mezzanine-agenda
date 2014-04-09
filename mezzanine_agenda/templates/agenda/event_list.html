@@ -1,0 +1,157 @@
+{% extends "base.html" %}
+{% load i18n future mezzanine_tags event_tags keyword_tags disqus_tags %}
+
+{% block meta_title %}{% if page %}{{ page.richtextpage.meta_title }}{% else %}{% trans "Events" %}{% endif %}{% endblock %}
+
+{% block meta_keywords %}{% metablock %}
+{% keywords_for page as keywords %}
+{% for keyword in keywords %}
+    {% if not forloop.first %}, {% endif %}
+    {{ keyword }}
+{% endfor %}
+{% endmetablock %}{% endblock %}
+
+{% block meta_description %}{% metablock %}
+{{ page.description }}
+{% endmetablock %}{% endblock %}
+
+{% block title %}
+{% if page %}
+{% editable page.title %}{{ page.title }}{% endeditable %}
+{% else %}
+{% trans "Events" %}
+{% endif %}
+{% endblock %}
+
+{% block breadcrumb_menu %}
+{{ block.super }}
+{% if tag or location or year or month or author %}
+<li>{% spaceless %}
+{% if tag %}
+    {% trans "Tag:" %} {{ tag }}
+{% else %}{% if location %}
+    {% trans "Location:" %} {{ location }}
+{% else %}{% if year or month %}
+    {% if month %}{{ month }}, {% endif %}{{ year }}
+{% else %}{% if author %}
+    {% trans "Author:" %} {{ author.get_full_name|default:author.username }}
+{% endif %}{% endif %}{% endif %}{% endif %}
+{% endspaceless %}
+</li>
+{% endif %}
+{% endblock %}
+
+{% block main %}
+{% if tag or location or year or month or author %}
+    {% block event_list_filterinfo %}
+    <p>
+    {% if tag %}
+        {% trans "Viewing events tagged" %} {{ tag }}
+    {% else %}{% if location %}
+        {% trans "Viewing events for the location" %} {{ location }}
+    {% else %}{% if year or month %}
+        {% trans "Viewing events from" %} {% if month %}{{ month }}, {% endif %}
+        {{ year }}
+    {% else %}{% if author %}
+        {% trans "Viewing events by" %}
+        {{ author.get_full_name|default:author.username }}
+    {% endif %}{% endif %}{% endif %}{% endif %}
+    {% endblock %}
+    </p>
+{% else %}
+    {% if page %}
+    {% block event_list_pagecontent %}
+    {% editable page.richtextpage.content %}
+    {{ page.richtextpage.content|richtext_filters|safe }}
+    {% endeditable %}
+    {% endblock %}
+    {% endif %}
+{% endif %}
+
+{% block event_calendar %}
+<p><a href='{% icalendar_url %}' target="_blank" class="btn btn-default">
+    Subscribe to all events in Google Calendar/Outlook/iCal
+</a></p>
+{% endblock %}
+
+{% for event in events.object_list %}
+{% block event_list_event_title %}
+{% editable event.title %}
+<h2>
+    <a href="{{ event.get_absolute_url }}">{{ event.title }}</a>
+</h2>
+{% endeditable %}
+{% endblock %}
+{% block event_list_event_metainfo %}
+{% editable event.start event.end event.location %}
+<h6 class="post-meta">
+    {{ event.start }}
+    {% if event.end %}
+    {% trans "-" %} {{ event.end }}
+    {% endif %}
+    {% if event.location %}
+    {% trans "at" %}
+    <a href="{% url "event_list_location" event.location.slug %}">{{ event.location }}</a>
+    {% endif %}
+</h6>
+{% endeditable %}
+{% endblock %}
+
+{% if settings.EVENT_USE_FEATURED_IMAGE and event.featured_image %}
+{% block event_list_event_featured_image %}
+<a href="{{ event.get_absolute_url }}">
+    <img class="img-thumbnail pull-left" src="{{ MEDIA_URL }}{% thumbnail event.featured_image 90 90 %}">
+</a>
+{% endblock %}
+{% endif %}
+
+{% block event_list_event_content %}
+{% editable event.content %}
+{{ event.description_from_content|safe }}
+{% endeditable %}
+{% endblock %}
+
+{% block event_list_event_links %}
+<div class="event-list-detail">
+    {% keywords_for event as tags %}
+    {% if tags %}
+    <ul class="list-inline tags">
+    {% trans "Tags" %}:
+    {% spaceless %}
+    {% for tag in tags %}
+    <li><a href="{% url "event_list_tag" tag.slug %}" class="tag">{{ tag }}</a></li>
+    {% endfor %}
+    {% endspaceless %}
+    </ul>
+    {% endif %}
+    <p>
+    <a href="{{ event.get_absolute_url }}">{% trans "read more" %}</a>
+    {% if event.allow_comments %}
+    /
+    {% if settings.COMMENTS_DISQUS_SHORTNAME %}
+    <a href="{{ event.get_absolute_url }}#disqus_thread"
+        data-disqus-identifier="{% disqus_id_for event %}">
+        {% trans "Comments" %}
+    </a>
+    {% else %}
+    <a href="{{ event.get_absolute_url }}#comments">
+        {% blocktrans count comments_count=event.comments_count %}{{ comments_count }} comment{% plural %}{{ comments_count }} comments{% endblocktrans %}
+    </a>
+    {% endif %}
+    {% endif %}
+    </p>
+</div>
+{% endblock %}
+{% endfor %}
+
+{% pagination_for events %}
+
+{% if settings.COMMENTS_DISQUS_SHORTNAME %}
+{% include "generic/includes/disqus_counts.html" %}
+{% endif %}
+
+{% endblock %}
+
+{% block right_panel %}
+{% include "agenda/includes/filter_panel.html" %}
+{% endblock %}

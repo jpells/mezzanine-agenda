@@ -1,0 +1,149 @@
+{% extends "agenda/event_list.html" %}
+{% load mezzanine_tags comment_tags keyword_tags rating_tags i18n future disqus_tags event_tags %}
+
+{% block meta_title %}{{ event.meta_title }}{% endblock %}
+
+{% block meta_keywords %}{% metablock %}
+{% keywords_for event as tags %}
+{% for tag in tags %}{% if not forloop.first %}, {% endif %}{{ tag }}{% endfor %}
+{% endmetablock %}{% endblock %}
+
+{% block meta_description %}{% metablock %}
+{{ event.description }}
+{% endmetablock %}{% endblock %}
+
+{% block title %}
+{% editable event.title %}{{ event.title }}{% endeditable %}
+{% endblock %}
+
+{% block breadcrumb_menu %}
+{{ block.super }}
+<li class="active">{{ event.title }}</li>
+{% endblock %}
+
+{% block main %}
+
+{% block event_detail_postedby %}
+{% editable event.start event.end event.location %}
+<h6 class="post-meta">
+    {{ event.start }}
+    {% if event.end %}
+    {% trans "-" %} {{ event.end }}
+    {% endif %}
+    {% if event.location %}
+    {% trans "at" %}
+    <a href="{% url "event_list_location" event.location.slug %}">{{ event.location }}</a>
+    {% endif %}</h6>
+{% endeditable %}
+{% endblock %}
+{% block event_detail_commentlink %}
+<p>
+    {% if event.allow_comments %}
+        {% if settings.COMMENTS_DISQUS_SHORTNAME %}
+            (<a href="{{ event.get_absolute_url }}#disqus_thread"
+                data-disqus-identifier="{% disqus_id_for event %}">{% spaceless %}
+                {% trans "Comments" %}
+            {% endspaceless %}</a>)
+        {% else %}(<a href="#comments">{% spaceless %}
+            {% blocktrans count comments_count=event.comments_count %}{{ comments_count }} comment{% plural %}{{ comments_count }} comments{% endblocktrans %}
+            {% endspaceless %}</a>)
+        {% endif %}
+    {% endif %}
+</p>
+{% endblock %}
+
+{% block event_detail_calendar %}
+<p><a href='{{ event|google_calendar_url }}' target="_blank" class="btn btn-default">
+    Add to Google Calendar
+</a>
+<a href='{% icalendar_url %}' class="btn btn-default">
+    Add to Outlook/iCal
+</a></p>
+{% endblock %}
+
+{% block event_detail_featured_image %}
+{% if settings.EVENT_USE_FEATURED_IMAGE and event.featured_image %}
+<p><img class="img-responsive" src="{{ MEDIA_URL }}{% thumbnail event.featured_image 600 0 %}"></p>
+{% endif %}
+{% endblock %}
+
+{% if settings.COMMENTS_DISQUS_SHORTNAME %}
+{% include "generic/includes/disqus_counts.html" %}
+{% endif %}
+
+{% block event_detail_content %}
+{% editable event.content %}
+{{ event.content|richtext_filters|safe }}
+{% endeditable %}
+{% endblock %}
+
+{% if event.location %}
+{% block event_detail_location %}
+{% editable event.location %}
+<div class="panel panel-default">
+    <div class="panel-body">
+    <p>
+	{{ event.location.address|linebreaksbr }}<br />
+	<a href="{{ event|google_nav_url }}" target="_blank" class="btn btn-default">
+	    Get Directions
+	</a>
+    </p>
+    {% google_static_map event 621 250 10 %}
+    </div>
+</div>
+{% endeditable %}
+{% endblock %}
+{% endif %}
+
+{% block event_detail_keywords %}
+{% keywords_for event as tags %}
+{% if tags %}
+{% spaceless %}
+<ul class="list-inline tags">
+    <li>{% trans "Tags" %}:</li>
+    {% for tag in tags %}
+    <li><a href="{% url "event_list_tag" tag.slug %}">{{ tag }}</a></li>
+    {% endfor %}
+</ul>
+{% endspaceless %}
+{% endif %}
+{% endblock %}
+
+{% block event_detail_rating %}
+<div class="panel panel-default rating">
+    <div class="panel-body">
+    {% rating_for event %}
+    </div>
+</div>
+{% endblock %}
+
+{% block event_detail_sharebuttons %}
+{% set_short_url_for event %}
+<a class="btn btn-sm share-twitter" target="_blank" href="http://twitter.com/home?status={{ event.short_url|urlencode }}%20{{ event.title|urlencode }}">{% trans "Share on Twitter" %}</a>
+<a class="btn btn-sm share-facebook" target="_blank" href="http://facebook.com/sharer.php?u={{ request.build_absolute_uri }}&amp;t={{ event.title|urlencode }}">{% trans "Share on Facebook" %}</a>
+{% endblock %}
+
+{% block event_previous_next %}
+<ul class="pager">
+{% with event.get_previous_by_publish_date as previous %}
+{% if previous %}
+<li class="previous">
+    <a href="{{ previous.get_absolute_url }}">&larr; {{ previous }}</a>
+</li>
+{% endif %}
+{% endwith %}
+{% with event.get_next_by_publish_date as next %}
+{% if next %}
+<li class="next">
+    <a href="{{ next.get_absolute_url }}">{{ next }} &rarr;</a>
+</li>
+{% endif %}
+{% endwith %}
+</ul>
+{% endblock %}
+
+{% block event_detail_comments %}
+{% if event.allow_comments %}{% comments_for event %}{% endif %}
+{% endblock %}
+
+{% endblock %}

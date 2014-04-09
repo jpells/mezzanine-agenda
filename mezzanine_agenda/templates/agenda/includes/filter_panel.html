@@ -1,0 +1,93 @@
+{% load event_tags keyword_tags i18n future %}
+
+{% block recent_events %}
+{% recent_events 5 as recent_events %}
+{% if recent_events %}
+<h3>{% trans "Recent Events" %}</h3>
+<ul class="list-unstyled recent-events">
+{% for recent_event in recent_events %}
+<li><a href="{{ recent_event.get_absolute_url }}"
+    >{{ recent_event.title }}</a></li>
+{% endfor %}
+</ul>
+{% endif %}
+{% endblock %}
+
+{% block event_months %}
+{% event_months as months %}
+{% if months %}
+<h3>{% trans "Archive" %}</h3>
+{% for month in months %}
+    {% ifchanged month.date.year %}
+        {% if not forloop.first %}</ul>{% endif %}
+        <h6>{{ month.date.year }}</h6><ul class="list-unstyled">
+    {% endifchanged %}
+    <li><a href="{% url "event_list_month" year=month.date.year month=month.date.month %}"
+        >{{ month.date|date:"F" }}</a> ({{ month.event_count }})</li>
+{% endfor %}
+</ul>
+{% endif %}
+{% endblock %}
+
+{% block event_locations %}
+{% event_locations as locations %}
+{% if locations %}
+<h3>{% trans "Locations" %}</h3>
+<ul class="list-unstyled">
+{% for location in locations %}
+<li><a href="{% url "event_list_location" location.slug %}"
+    >{{ location }}</a> ({{ location.event_count }})</li>
+{% endfor %}
+</ul>
+{% endif %}
+{% endblock %}
+
+{% block event_keywords %}
+{% keywords_for mezzanine_agenda.event as tags %}
+{% if tags %}
+<h3>{% trans "Tags" %}</h3>
+<ul class="list-inline tag-cloud">
+{% for tag in tags %}
+<li>
+    <a href="{% url "event_list_tag" tag.slug %}"
+        class="tag-weight-{{ tag.weight }}">{{ tag }}</a>
+    ({{ tag.item_count }})
+</li>
+{% endfor %}
+</ul>
+{% endif %}
+{% endblock %}
+
+{% block event_authors %}
+{% event_authors as authors %}
+{% if authors %}
+<h3>{% trans "Authors" %}</h3>
+<ul class="list-unstyled">
+{% for author in authors %}
+    <li><a href="{% url "event_list_author" author.username %}"
+        >{{ author.get_full_name|default:author.username }}</a>
+        ({{ author.event_count }})</li>
+{% endfor %}
+</ul>
+{% endif %}
+{% endblock %}
+
+{% block event_feeds %}
+<h3>{% trans "Feeds" %}</h3>
+{% if tag %}
+    <a href="{% url "event_feed_tag" tag.slug "rss" %}">{% trans "RSS" %}</a> /
+    <a href="{% url "event_feed_tag" tag.slug "atom" %}">{% trans "Atom" %}</a>
+{% endif %}
+{% if location %}
+    <a href="{% url "event_feed_location" location.slug "rss" %}">{% trans "RSS" %}</a> /
+    <a href="{% url "event_feed_location" location.slug "atom" %}">{% trans "Atom" %}</a>
+{% endif %}
+{% if author %}
+    <a href="{% url "event_feed_author" author.username "rss" %}">{% trans "RSS" %}</a> /
+    <a href="{% url "event_feed_author" author.username "atom" %}">{% trans "Atom" %}</a>
+{% endif %}
+{% if not tag and not location and not author %}
+    <a href="{% url "event_feed" "rss" %}">{% trans "RSS" %}</a> /
+    <a href="{% url "event_feed" "atom" %}">{% trans "Atom" %}</a>
+{% endif %}
+{% endblock %}

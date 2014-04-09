@@ -1,0 +1,26 @@
+[
+    {
+        "pk": 9,
+        "model": "pages.page",
+        "fields": {
+            "status": 2,
+            "_order": 1,
+            "parent": null,
+            "description": "Events",
+            "title": "Events",
+            "titles": "Events",
+            "content_model": "richtextpage",
+            "in_menus": [1, 2, 3],
+            "slug": "events",
+            "site": 1
+        }
+    },
+    {
+        "pk": 9,
+        "model": "pages.richtextpage",
+        "fields": {
+            "content": "<p>Events</p>"
+        }
+    }
+]
+
