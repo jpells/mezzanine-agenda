@@ -1,6 +1,6 @@
 # mezzanine-agenda
 
-This plugin gives you Event functionality for your Mezzanine sites.
+This plugin gives you Event functionality for your Mezzanine sites. Very similiar to mezzanine-events but rather than implementing Events as a custom Page object and managing through the Pages admin it is it's own content type that is managed on its own, similiar to Blog Posts. This allows for standard viewing and filtering of these events based on the date.
 
 ## Features
 
@@ -8,6 +8,10 @@ This plugin gives you Event functionality for your Mezzanine sites.
 	* Embed a map of the location in one line of code with the Google Static Maps template tag
 	* Provide a "Get Directions" link so users can go there in one click
 * Let your visitors add a single event or subscribe to all future events in Google Calendar, Outlook, iCal and more with Google Calendar and webcal:// URLs and iCalendar files
+* Filter events by date, location and author
+* RSS/Atom feeds
+* Event featured image
+* Event comments/ratings
 
 ## Installation
 
@@ -36,6 +40,7 @@ The Event object is available at `event`. It has the following properties:
 
 * Dates and times: `start`, `end`
 * Location info: `location.address`, `location.mappable_location`, `lat`, `lon`
+* Featured Image: `featured_image`
 
 ## Template Tags
 
@@ -44,6 +49,7 @@ The following template tags and filters can be used:
 - `{% event_locations as locations %}` - Put a list of locations for events into the template context.
 - `{% event_authors as authors %}` - Put a list of authors (users) for events into the template context.
 - `{% recent_events limit=5 tag="django" location="home" username="admin" as recent_events %}` - Put a list of recent events into the template context. A tag title or slug, location title or slug or author's username can also be specified to filter the recent events returned.
+- `{% upcoming_events limit=5 tag="django" location="home" username="admin" as upcoming_events %}` - Put a list of upcoming events into the template context. A tag title or slug, location title or slug or author's username can also be specified to filter the recent events returned.
 - `{% google_static_map event <width> <height> <zoom> %}` - Produces a Google static map centred around the event location, zoomed to the specified level. Produces the entire `img` tag, not just the URL.
 - `{% icalendar_url %}` - Returns the URL to an iCalendar file containing this event. Upon downloading this file, most calendar software including Outlook and iCal will handle this by adding it to their calendars.
 - `{{ event|google_calendar_url }}` - Returns a Google Calendar template URL. Google Calendar users can click a link to this URL to add the event to their calendar.
