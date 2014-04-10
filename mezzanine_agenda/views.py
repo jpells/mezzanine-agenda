@@ -40,9 +40,9 @@ def event_list(request, tag=None, year=None, month=None, username=None,
         tag = get_object_or_404(Keyword, slug=tag)
         events = events.filter(keywords__keyword=tag)
     if year is not None:
-        events = events.filter(Q(start__year=year) | Q(end__year=year))
+        events = events.filter(start__year=year)
         if month is not None:
-            events = events.filter(Q(start__month=month) | Q(end__month=month))
+            events = events.filter(start__month=month)
             try:
                 month = month_name[int(month)]
             except IndexError:
@@ -58,6 +58,7 @@ def event_list(request, tag=None, year=None, month=None, username=None,
         events = events.filter(user=author)
         templates.append(u"agenda/event_list_%s.html" % username)
     if not tag and not year and not location and not username:
+        #Get upcoming events/ongoing events
         events = events.filter(Q(start__gt=datetime.now()) | Q(end__gt=datetime.now())).order_by("start")
 
     prefetch = ("keywords__keyword",)
@@ -133,9 +134,9 @@ def icalendar(request, tag=None, year=None, month=None, username=None,
         tag = get_object_or_404(Keyword, slug=tag)
         events = events.filter(keywords__keyword=tag)
     if year is not None:
-        events = events.filter(Q(start__year=year) | Q(end__year=year))
+        events = events.filter(start__year=year)
         if month is not None:
-            events = events.filter(Q(start__month=month) | Q(end__month=month))
+            events = events.filter(start__month=month)
             try:
                 month = month_name[int(month)]
             except IndexError:
@@ -148,6 +149,7 @@ def icalendar(request, tag=None, year=None, month=None, username=None,
         author = get_object_or_404(User, username=username)
         events = events.filter(user=author)
     if not tag and not year and not location and not username:
+        #Get upcoming events/ongoing events
         events = events.filter(Q(start__gt=datetime.now()) | Q(end__gt=datetime.now())).order_by("start")
 
     prefetch = ("keywords__keyword",)

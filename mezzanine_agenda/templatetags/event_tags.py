@@ -5,7 +5,7 @@ from django import template
 from django.contrib.sites.models import Site
 from django.core.urlresolvers import reverse
 from django.db.models import Count, Q
-from django.utils import timezone as tz
+from django.utils import timezone
 from django.utils.http import urlquote as quote
 
 from mezzanine_agenda.models import Event, EventLocation
@@ -31,8 +31,13 @@ def event_months(*args):
     """
     Put a list of dates for events into the template context.
     """
+    if settings.EVENT_TIME_ZONE != "":
+        app_timezone = pytz.timezone(settings.EVENT_TIME_ZONE)
+    else:
+        app_timezone = timezone.get_default_timezone()
     dates = Event.objects.published().values_list("start", flat=True)
-    date_dicts = [{"date": datetime(d.year, d.month, 1)} for d in dates]
+    correct_timezone_dates = [timezone.make_naive(date, app_timezone) for date in dates]
+    date_dicts = [{"date": datetime(date.year, date.month, 1)} for date in correct_timezone_dates]
     month_dicts = []
     for date_dict in date_dicts:
         if date_dict not in month_dicts:
@@ -78,7 +83,7 @@ def recent_events(limit=5, tag=None, username=None, location=None):
 
     """
     events = Event.objects.published().select_related("user")
-    events = events.filter(Q(start__lt=datetime.now()) | Q(end__lt=datetime.now()))
+    events = events.filter(end__lt=datetime.now())
     title_or_slug = lambda s: Q(title=s) | Q(slug=s)
     if tag is not None:
         try:
@@ -117,6 +122,7 @@ def upcoming_events(limit=5, tag=None, username=None, location=None):
 
     """
     events = Event.objects.published().select_related("user")
+    #Get upcoming events/ongoing events
     events = events.filter(Q(start__gt=datetime.now()) | Q(end__gt=datetime.now()))
     title_or_slug = lambda s: Q(title=s) | Q(slug=s)
     if tag is not None:
@@ -145,16 +151,16 @@ def _get_utc(datetime):
     Convert datetime object to be timezone aware and in UTC.
     """
     if settings.EVENT_TIME_ZONE != "":
-        app_tz = pytz.timezone(settings.EVENT_TIME_ZONE)
+        app_timezone = pytz.timezone(settings.EVENT_TIME_ZONE)
     else:
-        app_tz = tz.get_default_timezone()
+        app_timezone = timezone.get_default_timezone()
 
     # make the datetime aware
-    if tz.is_naive(datetime):
-        datetime = tz.make_aware(datetime, app_tz)
+    if timezone.is_naive(datetime):
+        datetime = timezone.make_aware(datetime, app_timezone)
 
     # now, make it UTC
-    datetime = tz.make_naive(datetime, tz.utc)
+    datetime = timezone.make_naive(datetime, timezone.utc)
 
     return datetime
 
