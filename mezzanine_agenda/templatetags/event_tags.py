@@ -194,7 +194,7 @@ def google_nav_url(event):
     if not isinstance(event, Event):
         return ''
     location = quote(event.location.mappable_location)
-    return "https://{}/maps?daddr={}".format(settings.EVENT_GOOGLE_MAPS_DOMAIN.decode('utf-8'), location)
+    return "https://{}/maps?daddr={}".format(settings.EVENT_GOOGLE_MAPS_DOMAIN, location)
 
 
 @register.simple_tag
