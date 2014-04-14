@@ -111,12 +111,12 @@ def upcoming_events(limit=5, tag=None, username=None, location=None):
     """
     Put a list of upcoming events into the template
     context. A tag title or slug, location title or slug or author's
-    username can also be specified to filter the recent events returned.
+    username can also be specified to filter the upcoming events returned.
 
     Usage::
 
         {% upcoming_events 5 as upcoming_events %}
-        {% upcoming limit=5 tag="django" as upcoming_events %}
+        {% upcoming_events limit=5 tag="django" as upcoming_events %}
         {% upcoming_events limit=5 location="home" as upcoming_events %}
         {% upcoming_events 5 username=admin as upcoming_events %}
 
