@@ -17,7 +17,7 @@ This plugin gives you Event functionality for your Mezzanine sites. Very similia
 
 * Run `pip install mezzanine-agenda` (or, if you want to hack on mezzanine-agenda, clone it and run `pip install -e path/to/repo`)
 * Add `"mezzanine_agenda"` to your `INSTALLED_APPS`
-* Add `("^%s/" settings.EVENT_SLUG, include("mezzanine_agenda.urls"))` to your `urls.py`
+* Add `("^%s/" % settings.EVENT_SLUG, include("mezzanine_agenda.urls"))` to your `urls.py`
 * Set either the `TIME_ZONE` or `EVENT_TIME_ZONE` settings. (If neither of these settings are set, the Google Calendar links will not work as expected.)
 * Migrate your database
 * Create RichText Page `Events` similiar to `Blog` (can be done via python manage.py loaddata events_page or through admin). Ensure the page slug = settings.EVENT_SLUG.
