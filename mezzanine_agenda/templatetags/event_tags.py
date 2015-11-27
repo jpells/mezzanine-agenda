@@ -82,7 +82,7 @@ def recent_events(limit=5, tag=None, username=None, location=None):
         {% recent_events 5 username=admin as recent_pevents %}
 
     """
-    events = Event.objects.published().select_related("user")
+    events = Event.objects.published().select_related("user").order_by('-start')
     events = events.filter(end__lt=datetime.now())
     title_or_slug = lambda s: Q(title=s) | Q(slug=s)
     if tag is not None:
@@ -121,7 +121,7 @@ def upcoming_events(limit=5, tag=None, username=None, location=None):
         {% upcoming_events 5 username=admin as upcoming_events %}
 
     """
-    events = Event.objects.published().select_related("user")
+    events = Event.objects.published().select_related("user").order_by('start')
     #Get upcoming events/ongoing events
     events = events.filter(Q(start__gt=datetime.now()) | Q(end__gt=datetime.now()))
     title_or_slug = lambda s: Q(title=s) | Q(slug=s)
