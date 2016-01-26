@@ -7,6 +7,7 @@ from django.core.urlresolvers import reverse
 from django.db.models import Count, Q
 from django.utils import timezone
 from django.utils.http import urlquote as quote
+from django.utils.safestring import mark_safe
 
 from mezzanine_agenda.models import Event, EventLocation
 from mezzanine.conf import settings
@@ -207,7 +208,7 @@ def google_static_map(event, width, height, zoom):
         scale = 2
     else:
         scale = 1
-    return "<img src='http://maps.googleapis.com/maps/api/staticmap?size={width}x{height}&scale={scale}&format=png&markers={marker}&sensor=false&zoom={zoom}' width='{width}' height='{height}' />".format(**locals())
+    return mark_safe("<img src='http://maps.googleapis.com/maps/api/staticmap?size={width}x{height}&scale={scale}&format=png&markers={marker}&sensor=false&zoom={zoom}' width='{width}' height='{height}' />".format(**locals()))
 
 
 @register.simple_tag(takes_context=True)
