@@ -88,7 +88,11 @@
 	    Get Directions
 	</a>
     </p>
-    {% google_static_map event 621 250 10 %}
+    {% if settings.EVENT_GOOGLE_MAPS_API_KEY %}
+        {% google_interactive_map event 621 250 10 %}
+    {% else %}
+        {% google_static_map event 621 250 10 %}
+    {% endif %}
     </div>
 </div>
 {% endeditable %}

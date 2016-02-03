@@ -93,3 +93,11 @@ register_setting(
     editable=True,
     default=True,
 )
+
+register_setting(
+    name="EVENT_GOOGLE_MAPS_API_KEY",
+    description="If set, interactive google maps embed will be used instead of static images",
+    editable=True,
+    default=True,
+)
+
