@@ -211,6 +211,17 @@ def google_static_map(event, width, height, zoom):
     return mark_safe("<img src='http://maps.googleapis.com/maps/api/staticmap?size={width}x{height}&scale={scale}&format=png&markers={marker}&sensor=false&zoom={zoom}' width='{width}' height='{height}' />".format(**locals()))
 
 
+@register.simple_tag
+def google_interactive_map(event, width, height, zoom, map_type='roadmap'):
+    """
+    Generates an interactive google map for the event location.
+    """
+    location = quote(event.location.mappable_location)
+    api_key = settings.EVENT_GOOGLE_MAPS_API_KEY
+    center = marker = quote('{:.6},{:.6}'.format(event.location.lat, event.location.lon))
+    return mark_safe('<iframe width="{width}" height="{height}" frameborder="0" style="border:0" src="https://www.google.com/maps/embed/v1/place?q={location}&zoom={zoom}&center={center}&maptype={map_type}&key={api_key}" allowfullscreen></iframe>'.format(**locals()))
+
+
 @register.simple_tag(takes_context=True)
 def icalendar_url(context):
     """
